@@ -7,7 +7,7 @@ The command line requires a single input that is either the name of the city or 
 
 A sample input is given as follows,
 
-# > node weather.js -c="London"
-# > node weather.js -city=2172797 
+$ node weather.js -c="London" 
+$ node weather.js -city=2172797 
 
 
