@@ -1,31 +1,34 @@
 const APIKEY = 'e4586beaf87275dedf9cfb1c2d12c743';
 const https = require('https');
-const cityID = process.argv.slice(2);
+const yargs = require('yargs');
+const _ = require('lodash');
 
+const argv = yargs
+  .option('city', {
+    alias: 'c',
+    describe: 'The ID or the name of the city',
+    demand: true
+  })
+  .help()
+  .argv;
 
-/*  "id": 1172451,
-  "name": "Lahore",
-  "country": "PK",
-  "coord": {
-    "lon": 74.343613,
-    "lat": 31.549721 */
+const city = argv.city;
 
-
-function getWeatherForecast(cityID)
-{
+function getWeatherForecast(city) {
   try {
-    var url = `https://api.openweathermap.org/data/2.5/forecast?id=${cityID}&APPID=${APIKEY}`
-    https.get(url, function(response)
-     {
+    if (_.isString(city)) {
+      var url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&APPID=${APIKEY}`;
+    } else {
+      var url = `https://api.openweathermap.org/data/2.5/forecast?id=${city}&APPID=${APIKEY}`;
+    }
+    https.get(url, function (response) {
 
-       var data = "";
-       response.on('data', (chunk) =>
-       {
-         data+=chunk;
+      var data = "";
+      response.on('data', (chunk) => {
+        data += chunk;
       });
 
-      response.on('end', ()=>
-      {
+      response.on('end', () => {
         var parse = JSON.parse(data);
 
         console.log(`Weather report for ${parse.city.name}(${parse.city.country}) is given as:`)
@@ -34,39 +37,29 @@ function getWeatherForecast(cityID)
 
     });
 
-    request.on('error', ()=>
-    {
+    request.on('error', () => {
       console.error(`Error! Something went wrong.`);
     });
   } catch (error) {
-    console.error(error.message);
+
   }
 }
 
-
-
-
-
-
-function printWeatherDetails(data)
-{
-  var array=[];
-  var array2=[];
-  for(let i=0 ;i < data.length ; i++)
-  {
+function printWeatherDetails(data) {
+  var array = [];
+  var array2 = [];
+  for (let i = 0; i < data.length; i++) {
     array.push(data[i].description);
     array2.push(data[i].main);
   }
   return array.concat(array2);
 }
 
-function getAllDetails(data)
-{
-  for(let i=0; i<data.length; i++)
-  {
-    console.log(data[i].dt_txt, 'Temperature:',data[i].main.temp,`(Min: ${data[i].main.temp_min}, Max: ${data[i].main.temp_max})`, printWeatherDetails(data[i].weather));
+function getAllDetails(data) {
+  for (let i = 0; i < data.length; i++) {
+    console.log(data[i].dt_txt, 'Temperature:', data[i].main.temp, `(Min: ${data[i].main.temp_min}, Max: ${data[i].main.temp_max})`, printWeatherDetails(data[i].weather));
   }
 }
 
 
-getWeatherForecast(cityID);
+getWeatherForecast(city);
